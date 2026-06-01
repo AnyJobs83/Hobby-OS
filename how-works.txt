@@ -1,0 +1,46 @@
+Pretty much the order stuff goes in
+
+BIOS calls whatevers at 0x7C00
+    Thats my boot file, it does this:
+    Load kernel-setup into ram
+    
+    kernel-setup:
+        disable interupts
+        set up stack
+        Do sum legacy shit for backwards compatability (A20 Line)
+        Set up GDT (global descriptor table)
+        Go into 32 bit OS (protected mode)
+        jump to protected setup
+    
+    _protected_setup:
+        set up stack
+        fix the gaps in the gdt and tss
+        jump to kmain
+
+    Jump to kernel
+
+    
+_hello_world:
+    mov ah, 0x0E
+    mov al, 'H'
+    int 0x10
+    mov al, 'e'
+    int 0x10
+    mov al, 'l'
+    int 0x10
+    mov al, 'l'
+    int 0x10
+    mov al, 'o'
+    int 0x10
+    mov al, ' '
+    int 0x10
+    mov al, 'W'
+    int 0x10
+    mov al, 'o'
+    int 0x10
+    mov al, 'r'
+    int 0x10
+    mov al, 'l'
+    int 0x10
+    mov al, 'd'
+    int 0x10

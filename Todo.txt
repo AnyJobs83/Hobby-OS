@@ -1,0 +1,17 @@
+Have done:
+    bootloader
+    GDT
+    write to VGA buffer
+
+Next steps:
+    Link up a c file
+    IDT
+    interupts
+    virtual memory
+    heap
+    tasks/processes
+    file system
+    drivers
+    syscalls
+    userland
+    ELF launcher
