@@ -10,23 +10,26 @@ _start:
 _kernel_init_real:
     cli                         ; disable interupts
 
+    mov ah, 0x0E
+    mov al, 'h'
+    int 0x10
+
     ; set up stack before any calls
-    mov ax, 0x1000
+    mov ax, 0x0000
     mov ds, ax
     mov es, ax
     mov ss, ax
-    mov sp, 0x8000              ; stack in the middle, below kernel data
+    mov sp, 0x7C00              ; set a temporary kernel stack at 0x7C00, gets set later in 32 bit mode
     
-    o32 lgdt [_gdt_descriptor]      ; link gdt table, need to fix the tss parts
+    lgdt [_gdt_descriptor]      ; link gdt table, need to fix the tss parts
 
     call _enable_a20            ; enable a20 mode
-    
 
     mov eax, cr0
     or  eax, 1
     mov cr0, eax                ; turn on protected mode
 
-    jmp 0x08:dword _kernel_init_protected
+    jmp 0x08: _kernel_init_protected
 
 _enable_a20:
     mov     ax, 0x2402              ; Get A20 gate status

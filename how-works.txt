@@ -1,3 +1,15 @@
+
+All absolute addresses in the code:
+
+- bootloader at 0x7C00
+- kernel at 0x7E00
+- temporary kernel stack at 0x7C00
+- kernel stack proper at somewhere
+
+
+
+
+
 Pretty much the order stuff goes in
 
 BIOS calls whatevers at 0x7C00

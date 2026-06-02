@@ -6,9 +6,10 @@ nasm -f bin boot.asm -o boot.bin || goto :error
 :: all kernel c and asm files, compile them to object files
 nasm -f elf32 kernel_setup.asm -o kernel_setup.o || goto :error
 nasm -f elf32 kernel.asm -o kernel.o || goto :error
+gcc -m32 -c kmain.c -o kmain.o || goto :error
 
 :: Link the kernel object files into an ELF executable
-i686-elf-ld -m elf_i386 -T linker.ld -o kernel.elf kernel_setup.o kernel.o || goto :error
+i686-elf-ld -m elf_i386 -T linker.ld -o kernel.elf kernel_setup.o kernel.o kmain.o || goto :error
 ::i686-elf-objdump -d -j .setup -m i8086 kernel.elf
 ::goto :end
 

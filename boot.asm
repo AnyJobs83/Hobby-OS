@@ -19,7 +19,7 @@ _error:
 _dap:
     db 16               ; how big the dap is
     db 0                ; just 0 for sum reason
-    dw 32               ; how many sectors kernel is
+    dw 32               ; how many sectors kernel is (max 32, or 64KB)
     dw 0x7E00           ; destination offset
     dw 0x0000           ; destination segment
     dq 1                ; which sector to start from (always 1)
