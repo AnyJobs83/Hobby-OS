@@ -2,9 +2,9 @@ Have done:
     bootloader
     GDT
     write to VGA buffer
+    Link up a c file
 
 Next steps:
-    Link up a c file
     IDT
     interupts
     virtual memory

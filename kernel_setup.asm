@@ -119,7 +119,10 @@ _kernel_init_protected:
 
     call _fix_gdt_and_tss
 
-    jmp _kmain
+    call _kmain
+
+    ; _kmain should not ever return and get back to this address, but if it does, hang
+    jmp $
 
 _fix_gdt_and_tss:
     ; fix the gdt_tss
