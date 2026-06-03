@@ -6,12 +6,11 @@ Have done:
 
 Next steps:
     IDT
-    interupts
-    virtual memory
-    heap
-    tasks/processes
-    file system
-    drivers
+    interupts/ PIC, APIC
+    paging
+    Memory mangagement, malloc
+    tasks/processes, process mangagement
+    file system, FAT
     syscalls
-    userland
-    ELF launcher
+    userland, cli, desktop, file explorer, text editor, doom, calc, chromium
+    drivers

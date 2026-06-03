@@ -1,16 +1,8 @@
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdarg.h>
+#include "vga_printer.h"
 
 void _kmain() {
-    volatile unsigned int *VGA = (volatile unsigned int *)0xB8000;
-
-    *VGA = 0x0F41; // White on black, 'A'
+    printf("Hello world\n");
 }
-
-
-struct IDTEntry {
-    uint16_t offset_low;
-    uint16_t selector;
-    uint8_t zero;
-    uint8_t type_attr;
-    uint16_t offset_high;
-} __attribute__((packed));
