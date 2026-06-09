@@ -4,6 +4,19 @@
 
 #define VGA_COLS 80
 
+//
+// DEFINED IN HEADER
+// 
+// enum Num_types {
+//     UNSIGNED_DEC,
+//     UNSIGNED_HEX,
+//     UNSIGNED_BIN,
+//     SIGNED_DEC,
+//     SIGNED_HEX,
+//     SIGNED_BIN
+// };
+
+
 volatile unsigned short *pVGA = (volatile unsigned short *)0xB8000;
 int currentCol = 0;
 bool inFormatMode = false;
@@ -17,38 +30,71 @@ void vga_print_char(char c) {
         currentCol = 0;
     }
 }
-void printf(char* str) {
+void vga_print_uint(unsigned int num) {
+    if (num > 10) {
+        vga_print_uint(num / 10);
+    }
+    vga_print_char('0' + (num % 10));
+}
+void vga_print_ubin(unsigned int num) {
+    if (num > 2) {
+        vga_print_ubin(num / 2);
+    }
+    vga_print_char('0' + (num % 2));
+}
+void vga_print_uhex(unsigned int num) {
+    if (num > 16) {
+        vga_print_uhex(num / 16);
+    }
+
+    if ((num % 16) >= 10) {
+        vga_print_char('A' + (num % 16 - 10));
+    } else {
+        vga_print_char('0' + (num % 16));
+    }
+}
+void printf(char* str, ...) {
+    va_list args;
+    va_start(args, str);
     while (*str) {
         char c = *str;
 
         if (inFormatMode) {
+            inFormatMode = !inFormatMode;
             switch (c) {
                 case ('s'):
-                    vga_print_char('s');
+                    printf(va_arg(args, char*));
                     break;
-                case ('f'):
-                    vga_print_char('f');
+                case ('u'):
+                    vga_print_uint(va_arg(args, unsigned int));
+                    break;
+                case ('x'):
+                    vga_print_char('0');
+                    vga_print_char('x');
+                    vga_print_uhex(va_arg(args, unsigned int));
+                    break;
+                case ('b'):
+                    vga_print_char('0');
+                    vga_print_char('b');
+                    vga_print_ubin(va_arg(args, unsigned int));
                 default:
-                    vga_print_char('?');
+                    printf("Format specifier not implemented");
             }
-
+        } else if (c == '%') {
             inFormatMode = !inFormatMode;
-        } else {
-            if (c == '%') {
-                inFormatMode = !inFormatMode;
-            } else if (c == '\n') {
-                for (int i = currentCol; i < VGA_COLS; i++) {
-                    vga_print_char(' ');
-                }
-            } else if (c == '\t') {
+        } else if (c == '\n') {
+            for (int i = currentCol; i < VGA_COLS; i++) {
                 vga_print_char(' ');
-                vga_print_char(' ');
-                vga_print_char(' ');
-                vga_print_char(' ');
-            } else {
-                vga_print_char(c);
             }
+        } else if (c == '\t') {
+            vga_print_char(' ');
+            vga_print_char(' ');
+            vga_print_char(' ');
+            vga_print_char(' ');
+        } else {
+            vga_print_char(c);
         }
         str++;
     }
+    va_end(args);
 }

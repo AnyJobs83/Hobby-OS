@@ -118,10 +118,12 @@ _kernel_init_protected:
     mov esp, _kernel_stack_top  ; set the kernel stack pointer
 
     call _fix_gdt_and_tss
-
+    
     call _kmain
 
     ; _kmain should not ever return and get back to this address, but if it does, hang
+    
+    ; mov dword [0xB8000], 0x0F41
     jmp $
 
 _fix_gdt_and_tss:

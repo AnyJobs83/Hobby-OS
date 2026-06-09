@@ -31,7 +31,49 @@ BIOS calls whatevers at 0x7C00
 
     Jump to kernel
 
+interupt_setup:
+    remap PIC
+    init IDT
+    remap all important IDT values
+    remap the idtr, the interupt descriptor the cpu reads
+    load the interupt descriptor by giving the cpu a pointer to it, not the actual struct
+    re enable interupts
+
+kmain:
+    call interupt setup
+
     
+
+
+
+how an interupt gets to the cpu:
+    pic/cpu get the vector
+    check idt entry at that vector
+    go to stub at that idt entry
+    stub:
+        CPU already pushed a whole bunch of stuff
+
+        If trap gate:
+            cli     (mabye not because trap gates are used for things like syscalls which may not want to disable interrupts)
+
+        pusha
+        push ds
+        push es
+        push fs
+        push gs
+        If cpu exception that doesn't push an error code:
+            push dummy error code
+        push int_vector
+
+        jump c handler
+
+        pop everything
+
+        If pic interupt
+            send eoi at the end
+
+
+
 _hello_world:
     mov ah, 0x0E
     mov al, 'H'
