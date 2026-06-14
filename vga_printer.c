@@ -3,22 +3,12 @@
 #include <stdarg.h>
 
 #define VGA_COLS 80
+#define VGA_ROWS 25
+#define VGA_START_PTR (volatile unsigned short *)0xB8000;
 
-//
-// DEFINED IN HEADER
-// 
-// enum Num_types {
-//     UNSIGNED_DEC,
-//     UNSIGNED_HEX,
-//     UNSIGNED_BIN,
-//     SIGNED_DEC,
-//     SIGNED_HEX,
-//     SIGNED_BIN
-// };
-
-
-volatile unsigned short *pVGA = (volatile unsigned short *)0xB8000;
+volatile unsigned short *pVGA = VGA_START_PTR;
 int currentCol = 0;
+int currentRow = 0;
 bool inFormatMode = false;
 
 void vga_print_char(char c) {
@@ -26,8 +16,14 @@ void vga_print_char(char c) {
     pVGA++;
 
     currentCol++;
-    if (currentCol == VGA_COLS) {
+    if (currentCol >= VGA_COLS) {
         currentCol = 0;
+
+        currentRow++;
+        if (currentRow >= VGA_ROWS) {
+            currentRow = 0;
+            pVGA = VGA_START_PTR;
+        }
     }
 }
 void vga_print_uint(unsigned int num) {

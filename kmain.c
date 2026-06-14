@@ -3,13 +3,15 @@
 #include <stdarg.h>
 #include "vga_printer.h"
 
-extern void _idt_default_stub(void);
 extern void _lidt(uint32_t);
 extern void _sti(void);
 extern void _remap_pic(void);
+extern void _send_eoi_to_master(void);
+extern void _send_eoi_to_slave(void);
+extern uint32_t _isr_table[256];
+extern uint8_t _read_scancode(void);
 
 #define IDT_ENTRIES 256
-
 #define IDT_INTERUPT_GATE   0b00001110
 #define IDT_TRAP_GATE       0b00001111
 #define IDT_DPL_RING_0      0b00000000
@@ -17,6 +19,24 @@ extern void _remap_pic(void);
 #define IDT_PRESENT         0b10000000
 #define IDT_NOT_PRESENT     0x00000000
 
+struct IDT_handler_registers {
+    uint32_t int_vector;
+    uint32_t GS;
+    uint32_t FS;
+    uint32_t ES;
+    uint32_t DS;
+    uint32_t EDI;
+    uint32_t ESI;
+    uint32_t EBP;
+    uint32_t ESP;
+    uint32_t EBX;
+    uint32_t EDX;
+    uint32_t ECX;
+    uint32_t EAX;
+    uint32_t EIP;
+    uint32_t CS;
+    uint32_t E_flags;
+}__attribute__((packed));
 
 struct IDTEntry {
    uint16_t offset_1;           // offset bits 0..15
@@ -50,21 +70,45 @@ void set_idt_entry(struct IDTEntry *e,
 void init_idt() {
     // Init idt entries to the default handler
     for (int i = 0; i < IDT_ENTRIES; i++) {
-        set_idt_entry(&IDT[i], (uint32_t)_idt_default_stub, 0x0008, IDT_PRESENT, IDT_DPL_RING_0, IDT_INTERUPT_GATE);
+        set_idt_entry(&IDT[i], _isr_table[i], 0x0008, IDT_PRESENT, IDT_DPL_RING_0, IDT_INTERUPT_GATE);
     }
 }
-void patch_idt() {
-    // Patch all of the interupt requests with the handlers that I've made
 
-    // CPU exceptions
-    // Divide by 0
-    // General Protection fault
-    // Double fault
-    // Page error
+void isr_handler(struct IDT_handler_registers stack) {
+    if (stack.int_vector != 32) {
+        printf("hello interrupt #%u", stack.int_vector);
+    }
+    switch (stack.int_vector) {
+        case (8):
+            printf("Double fault");
+            break;
+        case (13):
+            printf("General Protection fault");
+            break;
+        case (14):
+            printf("Page fault");
+        case (32):
+            //printf("timer");
+            break;
+        case (33):
+            uint8_t scancode = _read_scancode();
+            printf("Keyboard got pressed by %u", (uint32_t)scancode);
+            break;
+        case (44):
+            printf("mouse");
+            break;
+        default:
+            printf("Unimplmented Interrupt");
+    }
 
-    // IRQs
-    // Timer
-    // Keyboard
+    // Send EOI's
+    if (stack.int_vector >= 32 && stack.int_vector < 48) {
+        if (stack.int_vector >= 40) {
+            _send_eoi_to_slave();
+        }
+
+        _send_eoi_to_master();
+    }
 }
 
 void patch_idtr(struct IDTR *idtr) {
@@ -81,9 +125,6 @@ void _kmain() {
 
     // Initialise the idt
     init_idt();
-
-    // Patch all interupts that I have created handlers for, all others point to a generic
-    patch_idt();
 
     // Patch idtr
     patch_idtr(&idtr);
