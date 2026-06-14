@@ -3,10 +3,11 @@ Have done:
     GDT
     write to VGA buffer
     Link up a c file
+    IDT
+    PIC
 
 Next steps:
-    IDT
-    interupts/ PIC, APIC
+    interupts
     paging
     Memory mangagement, malloc
     tasks/processes, process mangagement

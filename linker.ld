@@ -4,7 +4,7 @@ SECTIONS {
     . = 0x7E00;
 
     .setup : {
-        kernel_setup.o(.setup)
+        kernel_setup_asm.o(.setup)
     }
     
     .text : { *(.text) }
