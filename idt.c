@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include "vga_printer.h"
-#include "isr_hadlers.h"
+#include "isr_handlers.h"
 
 extern void _lidt(uint32_t);
 extern void _sti(void);
@@ -47,13 +47,15 @@ void set_idt_entry(struct IDTEntry *e,
 }
 
 void init_idt() {
-    // Init idt entries to the default handler
+    // Init idt entries that each point to an address in the _isr_table
+    // _isr_table is an assembly array of addresses that point to stubs,
+    // And each stub handles the stack and calls the generic isr_handler in isr_handlers.c
     for (int i = 0; i < IDT_ENTRIES; i++) {
         set_idt_entry(&IDT[i], _isr_table[i], 0x0008, IDT_PRESENT, IDT_DPL_RING_0, IDT_INTERUPT_GATE);
     }
 }
 
-void patch_idtr(struct IDTR *idtr) {
+void init_idtr(struct IDTR *idtr) {
     idtr -> limit = (uint16_t)(sizeof(IDT) - 1);
     idtr -> offset = (uint32_t)IDT;
 }
@@ -66,7 +68,7 @@ void idt_main() {
     init_idt();
 
     // Patch idtr
-    patch_idtr(&idtr);
+    init_idtr(&idtr);
 
     // call lidt
     _lidt((uint32_t)&idtr);

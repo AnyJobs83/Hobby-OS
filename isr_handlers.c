@@ -2,25 +2,40 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include "vga_printer.h"
-#include "isr_hadlers.h"
+#include "isr_handlers.h"
 
 extern void _send_eoi_to_master(void);
 extern void _send_eoi_to_slave(void);
 extern uint8_t _read_scancode(void);
+extern uint8_t _read_ps2_status(void);
+
+volatile int counter = 0;
 
 void isr_32_timer() {
+    //printf("%u", counter);
+
+    _read_scancode();
+
     //printf("timer");
 }
 void isr_33_keyboard() {
-    uint8_t scancode = _read_scancode();
-    printf("Keyboard got pressed by %u", (uint32_t)scancode);
+    //volatile unsigned int reads = 0;
+    //while (_read_ps2_status() & 1) {
+        uint8_t scancode = _read_scancode();
+        // counter++;
+        // reads++;
+        // if (reads > 1) {
+        //     printf("Why the hell is reads reading more than once");
+        // }
+        printf("Keyboard %u        ", (uint32_t)scancode);
+    //}
 }
 
-void isr_handler(struct IDT_handler_registers stack) {
-    if (stack.int_vector != 32) {
-        printf("hello interrupt #%u", stack.int_vector);
+void isr_handler(struct IDT_handler_registers args) {
+    if (args.int_vector != 32) {
+        //printf("hello interrupt #%u", stack.int_vector);
     }
-    switch (stack.int_vector) {
+    switch (args.int_vector) {
         case (8):
             printf("Double fault");
             break;
@@ -29,6 +44,7 @@ void isr_handler(struct IDT_handler_registers stack) {
             break;
         case (14):
             printf("Page fault");
+            break;
         case (32):
             isr_32_timer();
             break;
@@ -43,11 +59,13 @@ void isr_handler(struct IDT_handler_registers stack) {
     }
 
     // Send EOI's
-    if (stack.int_vector >= 32 && stack.int_vector < 48) {
-        if (stack.int_vector >= 40) {
+    if (args.int_vector >= 32 && args.int_vector < 48) {
+        if (args.int_vector >= 40) {
+            printf("slave");
             _send_eoi_to_slave();
         }
 
         _send_eoi_to_master();
+        //if (args.int_vector != 32) printf("master");
     }
 }

@@ -4,6 +4,7 @@ GLOBAL _lidt
 GLOBAL _sti
 GLOBAL _remap_pic
 GLOBAL _read_scancode
+GLOBAL _read_ps2_status
 GLOBAL _send_eoi_to_master
 GLOBAL _send_eoi_to_slave
 GLOBAL _isr_table
@@ -22,6 +23,11 @@ _sti:
 _read_scancode:
     xor eax, eax
     in al, 0x60
+    ret
+
+_read_ps2_status:
+    xor eax, eax
+    in al, 0x64
     ret
 
 _send_eoi_to_master:
@@ -103,11 +109,11 @@ _idt_stub_%1:
     push es
     push fs
     push gs
-    push dword %1         ; Vector number
+    push dword %1       ; Vector number
 
     call isr_handler
 
-    add esp, 4      ; Pop the interrupt vector
+    add esp, 4          ; Pop the interrupt vector
     pop gs
     pop fs
     pop es

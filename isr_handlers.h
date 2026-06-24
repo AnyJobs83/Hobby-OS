@@ -5,10 +5,10 @@
 
 struct IDT_handler_registers {
     uint32_t int_vector;
-    uint32_t GS;
-    uint32_t FS;
-    uint32_t ES;
-    uint32_t DS;
+    uint16_t GS;
+    uint16_t FS;
+    uint16_t ES;
+    uint16_t DS;
     uint32_t EDI;
     uint32_t ESI;
     uint32_t EBP;
@@ -17,6 +17,7 @@ struct IDT_handler_registers {
     uint32_t EDX;
     uint32_t ECX;
     uint32_t EAX;
+    uint32_t error_code;
     uint32_t EIP;
     uint32_t CS;
     uint32_t E_flags;

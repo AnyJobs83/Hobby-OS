@@ -1,0 +1,52 @@
+Problem
+
+After a while (1 - 7ish seconds) of the interrupts working fine, they randomly stop working.
+I don't get any errors, but nothing happens when I press any buttons
+
+It normally breaks well before reaching the end of the vga text buffer
+It happens after 0 - 7 seconds
+Can happen from only pressing one key repeatedly, or spamming any keys
+Will still happen if I slowly press and release the key
+
+
+All of the tests I have done:
+
+1.  have a variable for the keyboard isr running that I check in the timer isr,
+    just in case the timer was running during the isq, never was true
+
+2.  I tried reading the scancode port in the timer irq, just to see what that did
+    It still broke as often as before, but it would fix itself after a couple of seconds of nothing
+
+3.  Tested that I am sending the eoi by logging master / slave, always logged master
+
+4.  Tried making the interrupt only increment a counter that I printed in the timer int, made no difference
+    Also tried moving the printing to kmain (the main kernel function), still no difference
+
+5.  Tried reading the scancode while the int(0x64) bit 0 said that there are still scancodes in the queue,
+    this made it not break when I pressed two buttons in quick succession.
+    HOWEVER, after this I tried adding a counter to see how many times I have read inside that while loop,
+    and it sometimes will print that I have read the scancode more than once, 
+    
+    but NEVER when I do the same quick key presses that would break it before,
+    even though having the while loop stops it from breaking like that
+
+6.  When I combine the while loop in the keyboard_isr and the reading the scancode port in the timer,
+    it makes it very hard to break, but it still will break if i just run my hand over the keyboard for a bit
+
+Ways I've narrowed it down
+
+1.  I know that pressing two buttons quickly like a roll off causes it to fuck up
+
+2.  Timer always works, even when printing each time the timer isr goes
+
+3.  I've printed the scancode, and it might break when pressing, holding, and releasing, no difference
+
+Ideas I have for what might be wrong in order of how likely I think it is
+
+1.  Somehow it isn't reading the scancode?
+
+2.  The call stack could be getting corrupted
+
+3.  Some sort of concurrency bug with multiple ISRs running at the same time
+
+4.  EOI could not be sending even though it is printing that it has sent
