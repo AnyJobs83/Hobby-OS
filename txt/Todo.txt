@@ -8,6 +8,7 @@ Have done:
 
 
 Next steps:
+    get ram map from bios, create bitmap of frames
     paging
     Memory mangagement, malloc
     tasks/processes, process mangagement

@@ -37,7 +37,7 @@ struct E820_entry {
     uint32_t attributes;
 }__attribute__((packed));
 
-struct E820_entry E820_array[128];
+struct E820_entry E820_buffer[128];
 
 uint32_t frame_bitmap[32768];
 
@@ -47,6 +47,7 @@ void init_frame_bitmap() {
 
 /*
     TODO
+    Fix up all addresses, create a second stage bootloader
 
     Frame manager
         - Ask the bro BIOS what ram is taken

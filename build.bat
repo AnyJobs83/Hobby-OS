@@ -3,6 +3,8 @@
 :: assemble the bootloader
 nasm -f bin boot.asm -o boot.bin || goto :error
 
+:: compile all c and asm file in the trampoline / 2nd stage bootloader
+
 :: all kernel c and asm files, compile them to object files
 nasm -f elf32 kernel_setup.asm -o kernel_setup_asm.o || goto :error
 nasm -f elf32 interrupts/idt.asm -o idt_asm.o || goto :error
@@ -12,6 +14,7 @@ i686-elf-gcc -m32 -ffreestanding -c kmain.c -o kmain.o || goto :error
 i686-elf-gcc -m32 -ffreestanding -c helpers/vga_printer.c -o vga_printer.o || goto :error
 
 :: Link the kernel object files into an ELF executable
+:: i686-elf-ld -m elf_i386 -T trampoline.ld -o trampoline.elf
 i686-elf-ld -m elf_i386 -T linker.ld -o kernel.elf kernel_setup_asm.o kmain.o vga_printer.o idt.o idt_asm.o isr_handlers.o || goto :error
 ::i686-elf-objdump -d -j .setup -m i8086 kernel.elf
 ::goto :end

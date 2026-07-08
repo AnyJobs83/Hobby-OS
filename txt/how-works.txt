@@ -62,14 +62,16 @@ Paging ties into
 how paging works:
     each process has its own page directory that contains up to (4 GiB)
         inside each page directory is a contiguous array of page tables (4 MiB)
-            inside each page table is a 1024 page table entries that map to the physical frames (4KiB)
-
-    When editing a page,
+            inside each page table is 1024 page table entries that map to the physical frames (4KiB)
 
     when a program writes to memory, the MMU checks the TLB (cache) for the frame, if it misses,
     it reads the 10 MSB to find the index of the PDE, then uses the CR3 register and the index to get the address of the PT,
     it then reads the next 10 SB to find the index of the PTE inside the PT,
     then it uses 20 of the bits in the PTE as the frame number in RAM, plus the offset of the 12 LSB in the virtual address
+
+    Generally, the last PDE points back to itself, known as recursive paging or smth idk,
+    so that when the kernel wants to edit the page tables, instead of the cpu going PDE -> PTE -> Page,
+    it goes PDE -> back to PDE -> PTE, and the CPU thinks it has found the page, but its actually editing the PTE
 
 
 how an interupt gets to the cpu:
