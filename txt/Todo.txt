@@ -6,7 +6,6 @@ Have done:
     IDT
     PIC
 
-
 Next steps:
     get ram map from bios, create bitmap of frames
     paging
@@ -16,6 +15,10 @@ Next steps:
     syscalls
     userland, cli, desktop, file explorer, text editor, doom, calc, chromium
     drivers
+
+
+Cool things that proper kernels do
+    Make bootloader read disk in chunks
 
 
 Bugs cbbs figuring out now:

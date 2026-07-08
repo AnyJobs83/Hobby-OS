@@ -4,9 +4,10 @@
 
 #define VGA_COLS 80
 #define VGA_ROWS 25
-#define VGA_START_PTR (volatile unsigned short *)0xB8000;
 
-volatile unsigned short *pVGA = VGA_START_PTR;
+extern uint16_t VGA_START;
+
+volatile uint16_t *pVGA = &VGA_START;
 int currentCol = 0;
 int currentRow = 0;
 bool inFormatMode = false;
@@ -22,7 +23,7 @@ void vga_print_char(char c) {
         currentRow++;
         if (currentRow >= VGA_ROWS) {
             currentRow = 0;
-            pVGA = VGA_START_PTR;
+            pVGA = &VGA_START;
         }
     }
 }

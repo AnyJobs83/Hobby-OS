@@ -1,9 +1,8 @@
-section .setup
-
 GLOBAL _start
-GLOBAL _get_memory_map
-EXTERN _kmain
-EXTERN _kernel_stack_top
+EXTERN kmain
+EXTERN kernel_stack_top
+EXTERN temp_kstack
+EXTERN _read_bios_e820
 
 BITS 16
 
@@ -20,13 +19,13 @@ _kernel_init_real:
     mov ds, ax
     mov es, ax
     mov ss, ax
-    mov sp, 0x7C00              ; set a temporary kernel stack at 0x7C00, gets set later in 32 bit mode
+    mov sp, temp_kstack                 ; set a temporary kernel stack, gets set later in 32 bit mode
     
-    lgdt [dword _gdt_descriptor]      ; link gdt table, need to fix the tss parts
+    lgdt [dword _gdt_descriptor]        ; link gdt table, need to fix the tss parts
 
     call _enable_a20            ; enable a20 mode
 
-    ;call _get_memory_map             ; write the BIOS memory map to 
+    call _read_bios_e820
 
     mov eax, cr0
     or  eax, 1
@@ -104,7 +103,7 @@ _gdt_end:
 
 _tss_start:
     dd 0x00000000       ; previous TSS link (unused)
-    dd 0x00000000       ; _kernel_stack_top ← patched at runtime
+    dd 0x00000000       ; kernel_stack_top ← patched at runtime
     dd 0x00000010       ; points to _gdt_kernel_data
     times 22 dd 0
 _tss_end:
@@ -118,11 +117,11 @@ _kernel_init_protected:
     mov gs, ax
     mov ss, ax
 
-    mov esp, _kernel_stack_top  ; set the kernel stack pointer
+    mov esp, kernel_stack_top  ; set the kernel stack pointer
 
     call _fix_gdt_and_tss
-    
-    call _kmain
+
+    call kmain
 
     ; _kmain should not ever return and get back to this address, but if it does, hang
     
@@ -139,7 +138,7 @@ _fix_gdt_and_tss:
     mov byte [_gdt_tss + 7], al
 
     ; fix tss
-    mov dword [_tss_start + 0x04], _kernel_stack_top
+    mov dword [_tss_start + 0x04], kernel_stack_top
 
     ; load TSS
     mov ax, 0x28
