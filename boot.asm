@@ -8,7 +8,7 @@ _start:
     int 0x13            ; load kernel
     jc _error
 
-    jmp 0x0000:0x7E00   ; jump to kernel
+    jmp 0x1000:0x0000   ; jump to kernel
 
 _error:
     mov ah, 0x0E
@@ -20,8 +20,8 @@ _dap:
     db 16               ; how big the dap is
     db 0                ; just 0 for sum reason
     dw 32               ; how many sectors kernel is (max 32, or 64KB)
-    dw 0x7E00           ; destination offset
-    dw 0x0000           ; destination segment
+    dw 0x0000           ; destination offset
+    dw 0x1000           ; destination segment
     dq 1                ; which sector to start from (always 1)
 
 times 510 - ($ - $$) db 0

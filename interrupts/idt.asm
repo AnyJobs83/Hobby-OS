@@ -33,10 +33,12 @@ _read_ps2_status:
 _send_eoi_to_master:
     mov al, 0x20
     out 0x20, al
+    ret
 
 _send_eoi_to_slave:
     mov al, 0x20
     out 0xA0, al
+    ret
 
 _remap_pic:
     ; save masks

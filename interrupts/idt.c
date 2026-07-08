@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
-#include "vga_printer.h"
+#include "../helpers/vga_printer.h"
 #include "isr_handlers.h"
 
 extern void _lidt(uint32_t);

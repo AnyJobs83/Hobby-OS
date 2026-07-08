@@ -1,7 +1,7 @@
 ENTRY(_start)
 
 SECTIONS {
-    . = 0x7E00;
+    . = 0x10000;
 
     .setup : {
         kernel_setup_asm.o(.setup)

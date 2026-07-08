@@ -1,6 +1,7 @@
 section .setup
 
 GLOBAL _start
+GLOBAL _get_memory_map
 EXTERN _kmain
 EXTERN _kernel_stack_top
 
@@ -21,15 +22,17 @@ _kernel_init_real:
     mov ss, ax
     mov sp, 0x7C00              ; set a temporary kernel stack at 0x7C00, gets set later in 32 bit mode
     
-    lgdt [_gdt_descriptor]      ; link gdt table, need to fix the tss parts
+    lgdt [dword _gdt_descriptor]      ; link gdt table, need to fix the tss parts
 
     call _enable_a20            ; enable a20 mode
+
+    ;call _get_memory_map             ; write the BIOS memory map to 
 
     mov eax, cr0
     or  eax, 1
     mov cr0, eax                ; turn on protected mode
 
-    jmp 0x08: _kernel_init_protected
+    jmp 0x08: dword _kernel_init_protected
 
 _enable_a20:
     mov     ax, 0x2402              ; Get A20 gate status
