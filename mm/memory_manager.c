@@ -25,29 +25,8 @@ void init_page(PDE_t PDE, int table_index) {
 
 }
 
-
-
-
-extern void _get_memory_map(struct E820_entry E820_array[]);
-
-struct E820_entry {
-    uint64_t base_address;
-    uint64_t length;
-    uint32_t type;
-    uint32_t attributes;
-}__attribute__((packed));
-
-struct E820_entry E820_buffer[128];
-
-uint32_t frame_bitmap[32768];
-
-void init_frame_bitmap() {
-
-}
-
 /*
     TODO
-    Fix up all addresses, create a second stage bootloader
 
     Frame manager
         - Ask the bro BIOS what ram is taken

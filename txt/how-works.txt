@@ -19,25 +19,20 @@ BIOS calls whatevers at 0x7C00
     
     kernel-setup:
         disable interupts
-        set up stack
+        set up temporary stack
         Do sum legacy shit for backwards compatability (A20 Line)
         Set up GDT (global descriptor table)
+        read the e820 bios map of ram
         Go into 32 bit OS (protected mode)
         jump to protected setup
     
     _protected_setup:
         set up stack
         fix the gaps in the gdt and tss
+        init the frame bitmap
+        init the page tables
+        enable paging
         jump to kmain
-
-    Jump to kernel_trampoline
-
-kernel_trampoline:
-    indentity_map the kernel_trampoline
-
-    map the kernel to the higher half
-
-    jump to kmain
 
 kmain:
     call interupt setup

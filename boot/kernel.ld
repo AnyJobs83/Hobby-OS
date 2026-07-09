@@ -1,3 +1,4 @@
+ENTRY(_start)
 
 kernel_stack_top = 0x7000;
 kernel_start = 0x40000;

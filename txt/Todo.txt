@@ -22,5 +22,6 @@ Cool things that proper kernels do
 
 
 Bugs cbbs figuring out now:
+    Printf might break if I chain strings inside each other, because of the global format variables
     Why do i init segments to be 0x10?
     Why does kmain returning not write to the vga buffer when it did 2 mins ago? I didn't change anything?
